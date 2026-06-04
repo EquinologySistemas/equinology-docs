@@ -12,6 +12,12 @@ Público: veterinário / gestor.
 - `app/fatura/[token]` — visualização pública de fatura (payload no token, sem chamada à API).
 - `app/api/*` — proxies server-side de IA (chat, transcrição) via OpenRouter.
 
+## Patrocinadores (Anúncios)
+
+`SponsorModal` (em `(dashboard)/_components`) exibe o anúncio segmentado por
+estado/cidade ao vet — lado de consumo do sistema de `Advertisement` (escopo geo,
+gerido em `equinology-adm` `/ads`). Ver [status do ecossistema](../overview/status.md#patrocinadores-no-web-profissional).
+
 ## Integração com a API
 
 - Wrapper `fetch` em `context/ApiContext.tsx` (`GetAPI/PostAPI/PutAPI/DeleteAPI`),

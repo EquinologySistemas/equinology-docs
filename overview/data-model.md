@@ -15,7 +15,8 @@
 ## Núcleo multi-tenant
 
 - `Company` (tenant) ⟶ tem muitos `User`, `Animal`, `Client` (via `ClientCompany` N:N).
-- `Animal` pertence a um `Client` e (opcionalmente) a um `StudFarm` (haras) e `Company`.
+- `Animal` pertence a um `Client` e (opcionalmente) a um `StudFarm` (haras — agora
+  com endereço completo + contato do responsável) e `Company`.
 - `Appointment` → `AppointmentAnimal` (pivô) — **âncora de todos os registros clínicos**.
 
 ## Grupos de entidades

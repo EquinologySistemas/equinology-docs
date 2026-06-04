@@ -36,7 +36,10 @@ clínicos; `appointment(-animal)`; financeiro (`transaction`/`payment`/`invoice`
 
 - **Asaas** (`infra/shared/bank/asaas.ts`): assinaturas e pagamento de faturas.
 - **Storage** R2/S3 (`POST /file`, **autenticado**).
-- **Email**: nodemailer/SMTP.
+- **Email**: provider selecionável via `EnvService` (Brevo / ZeptoMail / SMTP).
+  Transacionais (recuperação de senha de user/client) + automações agendadas
+  (`inactiveUsers.scheduler`, `expireTrialSignatures.scheduler`) usando templates
+  com o verde da marca. Ver [status do ecossistema](../overview/status.md#automações-de-e-mail-api--subsistema-novo).
 
 ## Pontos de atenção (auditoria 2026-05-28)
 

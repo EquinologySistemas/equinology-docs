@@ -19,12 +19,14 @@ espalhados pelos repositórios de código (preservados em [`archive/`](archive/)
 ## Índice
 
 - **Visão geral**
+  - [Status do ecossistema](overview/status.md) — o que se moveu desde a auditoria 2026-05-28
   - [Arquitetura](overview/architecture.md)
   - [Modelo de dados](overview/data-model.md)
   - [Personas e fluxos críticos](overview/personas-e-fluxos.md)
 - **Guias**
   - Desenvolvedor: [Setup local + variáveis de ambiente](guides/developer/setup.md) · [Convenções](guides/developer/convencoes.md)
   - Operações: [Deploy](guides/operations/deploy.md) · [Checklist de QA](guides/operations/qa-checklist.md)
+  - Onboarding (entrega): [Índice](guides/onboarding/README.md) — [D‑U‑N‑S](guides/onboarding/duns.md) · [Apple](guides/onboarding/apple-developer.md) · [Google Play](guides/onboarding/google-play.md) · [Asaas](guides/onboarding/asaas.md) · [E-mail/Zoho](guides/onboarding/email-automation-zoho.md)
   - Cliente: [Manual do tutor (app)](guides/client/tutor-app.md) · [Manual do veterinário (web)](guides/client/veterinario-web.md)
 - **Decisões (ADRs)**
   - [0001 — Ponte Fatura → Caixa](decisions/0001-fatura-caixa.md)

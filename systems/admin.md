@@ -10,7 +10,8 @@
 
 Público: `/login`. Sob `(private)`: `/` (dashboard financeiro + métricas),
 `/users`, `/companies` (tenants), `/plans`, `/coupons`, `/ads` (com targeting
-geográfico), `/subscriptions`, `/financial`, `/admins` (gated por `super_admin`).
+geográfico + campo `description`), `/subscriptions`, `/financial`, `/admins`
+(gated por `super_admin`).
 
 Todo item do sidebar resolve para página real; todo endpoint existe como
 controller `admin/*` guardado na API (`AdminAuthGuard`).
