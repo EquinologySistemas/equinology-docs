@@ -1,47 +1,51 @@
 # Modelo de dados
 
-> **Fonte da verdade:** `vetequus-api/prisma/schema.prisma` (~81 models). Este
-> documento é um mapa de leitura — não duplica colunas. Para campos exatos, leia
-> o schema.
+Os campos, tipos, índices e relações são definidos em `prisma/schema.prisma`, no repositório da API.
 
-## Atores
+## Identidade e relações
 
-| Model | Quem é | Token (payload) |
-|---|---|---|
-| `User` | Vet / gestor / colaborador (enum `UserRole`) | `{ sub, companyId, type: 'user' }` |
-| `Client` | Tutor (dono do cavalo) | `{ sub, companyId: 'no-company', type: 'client' }` |
-| `AdminUser` | Equipe interna (`super_admin`/`support`) | `{ sub, type: 'admin' }` |
+| Model | Responsabilidade |
+|---|---|
+| `Company` | Clínica/empresa do SaaS |
+| `User` | Profissional vinculado à empresa, com perfil de acesso |
+| `Client` | Tutor, com telefone/e-mail/CPF únicos quando preenchidos e código de vínculo |
+| `ClientCompany` | Associação entre tutor e clínica |
+| `ClientStudFarm` | Associação entre tutor e propriedade |
+| `AdminUser` | Usuário da equipe administrativa |
+| `Animal` | Cadastro do animal e vínculos com proprietário, empresa e propriedade |
+| `StudFarm` | Propriedade, endereço e contato do responsável |
 
-## Núcleo multi-tenant
+O telefone do tutor é normalizado em dígitos e identifica o cadastro no primeiro acesso. E-mail e CPF são opcionais no modelo; os fluxos de acesso e pagamento solicitam os dados necessários para cada operação.
 
-- `Company` (tenant) ⟶ tem muitos `User`, `Animal`, `Client` (via `ClientCompany` N:N).
-- `Animal` pertence a um `Client` e (opcionalmente) a um `StudFarm` (haras — agora
-  com endereço completo + contato do responsável) e `Company`.
-- `Appointment` → `AppointmentAnimal` (pivô) — **âncora de todos os registros clínicos**.
+## Grupos funcionais
 
-## Grupos de entidades
+| Área | Entidades e relações principais |
+|---|---|
+| Atendimento | `Appointment` reúne participantes `AppointmentAnimal`; os registros clínicos usam esse vínculo |
+| Clínico | Famílias `Dentistry*`, `General*`, `Orthopedic*`, `Reproduction*`; diagnóstico de receptora usa `ReproductionDiagnosisStage` |
+| Compartilhamento | `OwnerNote` por atendimento/animal; prescrições com `sharedWithOwner`; `AnimalNote` distingue autores `VET` e `OWNER` |
+| Saúde | `Vaccine`, `Deworming`, `Exam`, `Shoeing`, `SanitaryProtocol`, `SanitaryProtocolItem` |
+| Arquivos | `Attachment` identifica tipo/ID do registro, URL, nome, ordem e metadados |
+| Financeiro | `Invoice`, `Payment`, `Transaction`, `TransactionCategory`, `BankAccount`, `CreditCard` |
+| SaaS | `SignaturePlan`, `CompanySignature`, `Coupon` |
+| Estoque | `Product`, `ProductCategory`, `ProductStock`, `ProductUsage`, `FieldStock`, `Tag`, `ProductTag` |
+| CRM | `Board`, `Lead` |
+| Conteúdo | `Advertisement` e segmentação; `Tutorial`, `TutorialChapter` |
+| Organização | `Note`, `Reminder` com recorrência |
+| Infraestrutura | `RecoverPasswordCode`, `IdempotencyKey` |
 
-| Grupo | Models | Observação |
-|---|---|---|
-| Clínico (~41 tipos) | `Dentistry*` (6), `General*` (4), `Orthopedic*` (6), `Reproduction*` (24) | Todos keyados em `appointmentAnimalId` |
-| Saúde recorrente | `Exam`, `Vaccine`, `Deworming`, `Shoeing`, `SanitaryProtocol(+Item)` | |
-| Financeiro | `Invoice` (fatura), `Payment` (movimentação), `Transaction`, `TransactionCategory`, `BankAccount`, `CreditCard` | Ponte fatura→caixa: [ADR 0001](../decisions/0001-fatura-caixa.md) |
-| Assinatura/billing | `SignaturePlan`, `CompanySignature`, `Coupon` | Integra Asaas |
-| Estoque | `Product`, `ProductCategory`, `ProductStock`, `ProductUsage`, `FieldStock`, `Tag`, `ProductTag` | `FieldStock` = estoque volante |
-| CRM | `Board`, `Lead` | Kanban |
-| Marketing/admin | `Advertisement(+State/+City)`, `AdminUser` | Anúncios com escopo geo |
-| Util | `Note`, `Reminder`, `RecoverPasswordCode` | |
+## Financeiro
 
-## Convenções
+`Invoice` representa a fatura. `Payment` representa a movimentação e `Transaction`, seus lançamentos/parcelas. `Payment.invoiceId` associa o recebimento ao caixa. As cobranças externas são relacionadas por `bankPaymentId`. Leia [fatura e caixa](../decisions/0001-fatura-caixa.md) antes de alterar esse fluxo.
 
-- PK `uuid` (`@db.Uuid`); `@@map` define o nome real da tabela (snake_case).
-- Quase toda entidade de negócio carrega `companyId` para isolamento.
-- `Invoice.payments` (relação reversa, `onDelete: SetNull`) liga fatura à
-  movimentação de caixa gerada — ver [ADR 0001](../decisions/0001-fatura-caixa.md).
+## Situação dos registros
 
-## Drift de schema (atenção)
+Os campos `deletedAt` preservam referências ao arquivar registros nos fluxos que os utilizam. A exclusão solicitada pelo próprio tutor também limpa seus dados de cadastro, credenciais e conteúdo pessoal associado. O estado do portador do token é conferido em `src/infra/shared/auth/session-validity.ts`.
 
-Há sinais históricos de divergência código↔banco: migration
-`20260310134228_recreate_drift`, migrations de nome vazio, e
-`prisma/update_boards_leads.sql` (patch fora do Prisma). Ao mexer no schema,
-prefira `prisma migrate` e evite SQL manual. Ver [auditoria](../archive/AUDITORIA-VETEQUUS-2026-05-28.md), Fase 2 item 13.
+Consulte o serviço e o repositório da operação para determinar exatamente quais dados são alterados; o nome de um campo isolado não substitui o contrato do fluxo.
+
+## Evolução do banco
+
+O histórico está em `prisma/migrations/`. Entre as migrations recentes estão telefone único do tutor, anexos, conteúdo ao proprietário, auditoria de estoque, associação de cobranças e `20260831120000_add_idempotency_keys`.
+
+A situação de um banco é conferida com `prisma migrate status` no ambiente escolhido. O repositório registra o histórico a aplicar; o estado da instância é consultado durante a operação. Veja [setup](../guides/developer/setup.md) e [deploy](../guides/operations/deploy.md).

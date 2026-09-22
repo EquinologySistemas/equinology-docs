@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # API - Registro de Usuário e Empresa (Company)
 
 Documentação do fluxo de registro com suporte a criar nova empresa ou vincular a uma existente.

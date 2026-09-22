@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # Alterações no equinology-app-v2 — 18/05/2026
 
 Refatoração de alinhamento do app mobile com a web (`equinology-web-v2`) e a API (`vetequus-api`) após os Sprints 1–5 + round QA de 16/05/2026. Todas as alterações abaixo foram aplicadas diretamente no código.

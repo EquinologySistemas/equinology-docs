@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # API - Geral (General)
 
 Documentação das rotas de atendimentos veterinários gerais.

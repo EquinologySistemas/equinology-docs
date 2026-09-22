@@ -1,23 +1,18 @@
-# ADR 0001 — Ponte Fatura → Caixa
-
-**Status:** aceito (implementado).
-
-## Contexto
-Faturas (`Invoice`) e o caixa/movimentações (`Payment`) são conceitos distintos.
-Quando uma fatura é recebida, a entrada precisa aparecer no caixa sem digitação
-dupla, e sem duplicar se o recebimento for processado mais de uma vez.
+# ADR 0001 — Fatura e caixa
 
 ## Decisão
-Ao uma fatura transitar para `PAID` (edição manual ou pagamento via Asaas), a API
-cria automaticamente uma `Payment` de entrada. O vínculo é guardado em
-`Payment.invoiceId`, que dá **idempotência** (mesmo recebimento não duplica),
-exibição da origem ("Fatura #...") e auditoria. A criação é disparada apenas na
-**borda** (quando a fatura *acabou de* virar `PAID`), e a checagem
-`ensureInvoicePaymentExists` é idempotente por defesa em dobro.
 
-## Consequência
-- `Payment.invoiceId` é `onDelete: SetNull` — apagar a fatura mantém a entrada de caixa.
-- Falha ao auto-criar a movimentação **não** falha a operação da fatura (loga e segue);
-  o usuário pode lançar manualmente.
+Fatura (`Invoice`), movimentação (`Payment`) e lançamento/parcela (`Transaction`) têm responsabilidades distintas. Ao receber a fatura, a API associa uma movimentação de entrada por `Payment.invoiceId` e cria seu lançamento pago.
 
-Código: `vetequus-api/src/domain/application/services/invoice/invoice.service.ts`.
+`ensureInvoicePaymentExists` consulta o vínculo antes de criar a movimentação. A categoria utilizada é `Faturas recebidas`; cliente e animal da fatura são transportados para a movimentação quando presentes. A data de pagamento é preservada no lançamento.
+
+A confirmação pode ser acionada pelo fluxo de edição/recebimento e pelos retornos da integração financeira. O serviço trata também eventos de cobrança, incluindo estorno, vencimento e exclusão no gateway. No estorno, a situação financeira e os lançamentos vinculados são atualizados pelo fluxo correspondente.
+
+## Referências de manutenção
+
+- `vetequus-api/src/domain/application/services/invoice/invoice.service.ts`.
+- Models `Invoice`, `Payment` e `Transaction` em `prisma/schema.prisma`.
+- Controllers financeiros e webhook de assinatura.
+- [Modelo de dados](../overview/data-model.md) e [webhook](0003-webhook-asaas.md).
+
+Para alterar esse fluxo, confira tanto a fatura quanto o caixa, a situação retornada pelo gateway e as novas tentativas da mesma operação.

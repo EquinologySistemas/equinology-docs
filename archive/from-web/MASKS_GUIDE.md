@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # Guia de Máscaras de Input — equinology-web
 
 > **Regra:** Todos os campos que representam dados formatados (CPF, CNPJ, telefone, CEP, etc.) **devem** usar máscara. Use **react-imask** através do componente de input mascarado (ver ARCHITECTURE.md).

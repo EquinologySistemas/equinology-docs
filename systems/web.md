@@ -1,39 +1,46 @@
-# Sistema: equinology-web-v2 (web profissional)
+# Web profissional — equinology-web-v2
 
-**Stack:** Next.js 16 (App Router), React 19, Tailwind 4. **Repo:** `equinology-web-v2`.
-Público: veterinário / gestor.
+**Stack:** Next.js 16.1.6, React 19.2.3, TypeScript e Tailwind 4.
 
-## Rotas
+## Navegação
 
-- **`(auth)`** (público): `/login`, `/register`, `/recover-password`, `/mail-code`, `/plans`, `/checkout/[id]`.
-- **`(dashboard)`** (protegido): `/` (home), `/clients-equines` (+`/animals/[id]`),
-  `/services` (+`/[id]`, atendimentos), `/calendar`, `/notes`, `/stock`, `/financial`,
-  `/subscription`, `/crm`, `/clinic` (+`/odontograma`).
-- `app/fatura/[token]` — visualização pública de fatura (payload no token, sem chamada à API).
-- `app/api/*` — proxies server-side de IA (chat, transcrição) via OpenRouter.
+| Área | Caminho |
+|---|---|
+| Acesso e contratação | `app/(auth)/`: login, cadastro, recuperação, código, planos e checkout |
+| Início e operação | `app/(dashboard)/` |
+| Cadastros | `clients-equines/`, incluindo fichas de animais |
+| Atendimentos | `services/` |
+| Agenda | `calendar/` |
+| Financeiro, estoque e CRM | `financial/`, `stock/`, `crm/` |
+| Clínica, assinatura e organização | `clinic/`, `subscription/`, `notes/`, `reminders/` |
+| Sincronização | `sync/` |
+| Fatura compartilhada | `app/fatura/[token]/` |
+| IA no servidor | `app/api/chat/`, `app/api/audio/` |
 
-## Patrocinadores (Anúncios)
+A fatura compartilhada renderiza os dados transportados pelo token do link. O recebimento e a situação persistida da fatura são tratados pela API.
 
-`SponsorModal` (em `(dashboard)/_components`) exibe o anúncio segmentado por
-estado/cidade ao vet — lado de consumo do sistema de `Advertisement` (escopo geo,
-gerido em `equinology-adm` `/ads`). Ver [status do ecossistema](../overview/status.md#patrocinadores-no-web-profissional).
+## API e sessão
 
-## Integração com a API
+`context/ApiContext.tsx` centraliza as chamadas usando `NEXT_PUBLIC_API_URL`. Serviços em `services/` e componentes consomem esse cliente. Os utilitários de autenticação ficam em `lib/auth.ts` e `lib/auth-cookies.ts`.
 
-- Wrapper `fetch` em `context/ApiContext.tsx` (`GetAPI/PostAPI/PutAPI/DeleteAPI`),
-  base `NEXT_PUBLIC_API_URL`, Bearer do cookie. 401 → logout.
-- Camada `services/*.ts` mapeia endpoints (cobertura parcial; algumas tabelas chamam `GetAPI` direto).
-- Upload: `lib/upload.ts` (`fetch` multipart com Bearer — `/file` agora exige auth).
-- Middleware (`middleware.ts`): gating por token + `GET /signature/validation`.
+O cookie é configurado por `NEXT_PUBLIC_USER_TOKEN`. O middleware verifica sua presença e consulta `/signature/validation`. Para preservar a navegação da sessão durante indisponibilidade de rede, o middleware possui tratamento de timeout/erro de servidor; a API autoriza cada operação recebida. Respostas de autenticação são tratadas pelo cliente de API.
 
-## Convenções
+## Atendimentos e documentos
 
-- Máscaras de input: [MASKS_GUIDE](../archive/from-web/MASKS_GUIDE.md).
-- Componentes de UI: [UI_COMPONENTS](../archive/from-web/UI_COMPONENTS.md).
+As páginas de atendimentos usam a configuração das seções em `services/boardRecordService.ts` e os componentes de formulário em `app/(dashboard)/services/`. Há recursos de odontograma, laudos, prescrições, anexos e exportação de documentos.
 
-## Pontos de atenção
+Anotações destinadas ao proprietário e prescrições compartilhadas compõem o conteúdo apresentado no app. Ao alterar uma ficha, confira o DTO, o presenter e o mapeamento do app correspondente.
 
-- Cookie de auth **não httpOnly** (`lib/auth.ts`) — exposto a XSS; migrar para httpOnly.
-- Dependência `openai` e `NEXT_PUBLIC_OPENAI_API_KEY` **mortas** (IA viva usa OpenRouter server-side — [ADR 0002](../decisions/0002-ia-openrouter.md)).
-- Matcher do middleware tem entradas obsoletas (`/stock2`, `/cooperators`).
-- Backlog de requisições do cliente: [AUDITORIA_REQUISICOES_CLIENTE](../archive/from-web/AUDITORIA_REQUISICOES_CLIENTE.md) e [PLANO_IMPLEMENTACAO](../archive/from-web/PLANO_IMPLEMENTACAO_REQUISICOES.md).
+## Offline
+
+`lib/offline/` implementa cache em IndexedDB, IDs temporários, arquivos locais e fila de escritas elegíveis. A interface exibe indicadores e a tela `/sync`, com acompanhamento e ações de sincronização.
+
+O escopo das escritas está em `lib/offline/routes.ts`: atendimentos, participantes do atendimento, seções clínicas e registros de vacina, vermifugação, exame e casqueamento. Outras operações seguem o fluxo online. Antes do uso em campo, a sessão e os dados necessários devem ser carregados com conexão.
+
+Leia o [ADR 0004](../decisions/0004-offline.md) para manutenção desse fluxo.
+
+## IA e ambiente
+
+Chat e transcrição passam pelas rotas do servidor Next.js usando `OPENROUTER_API_KEY`. O código compartilhado de áudio fica em `lib/audio-transcribe.ts`. A URL da aplicação pode ser configurada com `NEXT_PUBLIC_APP_URL`.
+
+Configuração e comandos: [setup](../guides/developer/setup.md), [validação](../guides/operations/qa-checklist.md) e [deploy](../guides/operations/deploy.md).

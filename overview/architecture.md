@@ -1,49 +1,54 @@
 # Arquitetura
 
-```
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│ equinology-web-v2│     │ equinology-app-v2│     │  equinology-adm  │
-│  (vet / gestor)  │     │   (tutor/mobile) │     │   (super-admin)  │
-└────────┬─────────┘     └────────┬─────────┘     └────────┬─────────┘
-         │  HTTPS + JWT (Bearer)  │                        │
-         └────────────────────────┼────────────────────────┘
-                                   ▼
-                        ┌──────────────────────┐
-                        │     vetequus-api      │  NestJS (porta 3333)
-                        │  core / domain / infra│  Swagger /api · Scalar /reference
-                        └──────────┬────────────┘
-              ┌────────────────────┼───────────────────────┐
-              ▼                    ▼                        ▼
-        ┌──────────┐        ┌────────────┐          ┌──────────────┐
-        │ Postgres │        │   Asaas    │          │ Cloudflare R2│
-        │ (Prisma) │        │ (pagamento)│          │   / AWS S3   │
-        └──────────┘        └────────────┘          └──────────────┘
-                                   ▲
-                            email via SMTP (Hostinger/nodemailer)
+```mermaid
+flowchart LR
+    Web["Web profissional"] -->|HTTPS / JWT| API["API NestJS"]
+    App["App do tutor"] -->|HTTPS / JWT| API
+    Admin["Painel administrativo"] -->|HTTPS / JWT| API
+    Site["Site institucional"] -->|Conteúdo público| API
+    Web --> Offline["IndexedDB / fila local"]
+    Web --> Next["Rotas de IA no servidor Next.js"]
+    Next --> OpenRouter
+    API --> PostgreSQL
+    API --> Asaas
+    API --> R2["Storage S3 / Cloudflare R2"]
+    API --> SMTP
 ```
 
-## Princípios
+## Responsabilidades
 
-- **API é a única dona da regra de negócio.** Os 3 frontends não falam com banco
-  nem com Asaas diretamente — tudo passa pela `vetequus-api`.
-- **Multi-tenant por `companyId`.** O `companyId` vem **sempre do JWT** (decorator
-  `@CurrentCompanyId()`), nunca do corpo da requisição.
-- **Três atores com tokens distintos:** `User` (vet/gestor/colaborador, com
-  `companyId`), `Client` (tutor, `companyId: 'no-company'`), `AdminUser` (painel,
-  `type: 'admin'`, sem `companyId`).
-- **DDD-ish na API:** `core` (tipos base, `Either`), `domain` (repositórios como
-  interfaces + serviços), `infra` (HTTP, Prisma, integrações).
+- **API:** regras de negócio, persistência, autenticação, autorização e integrações de pagamento, arquivo e e-mail.
+- **Web:** operação da clínica, documentos e formulários clínicos. A camada offline mantém dados consultados e operações elegíveis no navegador, sincronizando com a API.
+- **App:** experiência do tutor, acesso aos animais, conteúdo compartilhado, notas próprias, perfil e pagamentos.
+- **Admin:** operação do SaaS, empresas, usuários, planos, cupons, assinaturas, anúncios e tutoriais.
+- **Institucional:** apresentação do produto, parceiros, tutoriais e páginas informativas; encaminha o acesso profissional para a web.
+- **IA:** as rotas `app/api/*` da web chamam OpenRouter no servidor Next.js. Essa integração pertence à web.
 
-## Deploy
+## Organização da API
 
-- API: VPS via SSH (`deploy.ps1`, chave `vetequus.pem`) em `https://vet.dominiodev.shop`.
-- Frontends: Next.js (web/adm) e EAS (app). Ver [guias de operações](../guides/operations/deploy.md).
+`src/infra/main.ts` inicia o NestJS. O fluxo usual é:
 
-## Integrações externas
+```text
+controller + DTO → serviço de aplicação → interface de repositório
+                                        → implementação Prisma → PostgreSQL
+                     ↓
+                  presenter → resposta HTTP
+```
 
-| Serviço | Uso | Onde no código |
+`src/core` contém tipos base e `Either`; `src/domain`, entidades, serviços e interfaces; `src/infra`, HTTP, banco e provedores externos.
+
+## Identidade e escopo
+
+| Ator | Identidade | Uso do escopo |
 |---|---|---|
-| **Asaas** | Assinaturas (cartão/PIX recorrente), pagamento de faturas pelo tutor | `src/infra/shared/bank/asaas.ts` |
-| **Cloudflare R2 / AWS S3** | Upload de arquivos (`POST /file`, requer auth) | `src/infra/shared/storage` |
-| **SMTP (nodemailer)** | E-mails (recuperação de senha) | `src/infra/shared/email` |
-| **OpenRouter** | Transcrição/IA — **server-side apenas** (web `app/api/*`) | ver [ADR 0002](../decisions/0002-ia-openrouter.md) |
+| Profissional (`User`) | JWT com `sub`, `companyId`, `type: user` | Operações da clínica |
+| Tutor (`Client`) | JWT com `sub`, `type: client`, `companyId: no-company` | Recursos vinculados ao proprietário |
+| Equipe (`AdminUser`) | JWT administrativo | Operações autorizadas pelo perfil administrativo |
+
+O `AuthGuard` global valida o JWT e a situação atual da conta. Guards específicos e verificações de vínculo nos serviços complementam a autorização. Em rotas da clínica, obtenha o escopo do token com `@CurrentCompanyId()`. Rotas administrativas recebem identificadores de empresas como alvo da operação, sob os guards administrativos.
+
+As escritas autenticadas com `Idempotency-Key` passam pelo interceptor de idempotência. A fila offline usa esse contrato. Consulte [ADR 0004](../decisions/0004-offline.md).
+
+## Execução
+
+A API escuta na porta `3333` por padrão (`PORT` permite alterar). Swagger: `/api`; Scalar: `/reference`. A configuração atual de clientes referencia `https://api.equinology.com.br`. Endereços e processos de publicação estão em [deploy](../guides/operations/deploy.md).

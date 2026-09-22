@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # Fatura pagável no app — 18/05/2026
 
 ## Objetivo

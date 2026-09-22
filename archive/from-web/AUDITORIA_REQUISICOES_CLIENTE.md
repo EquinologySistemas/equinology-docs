@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # Auditoria das Requisições do Cliente — Caderno 16/04/2026
 
 > Comparação item a item entre as anotações do cliente (`Anotações APP.docx`) e o estado atual do código em `equinology-web-v2`.

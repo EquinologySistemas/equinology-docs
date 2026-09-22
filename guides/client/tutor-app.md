@@ -1,24 +1,40 @@
-# Manual do Tutor — App Equinology
-
-Guia em linguagem de negócio para o dono do cavalo. (Rascunho — revisar com
-quem entende o atendimento ao cliente.)
+# Manual do tutor — App Equinology
 
 ## Primeiro acesso
-1. Abra o app e toque em **Primeiro acesso**.
-2. Informe o **e-mail** e o **CPF** cadastrados pelo seu veterinário.
-3. Você receberá um **código** para criar sua senha.
 
-## O que você encontra
-- **Início / Animais:** seus cavalos, agrupados por categoria, com foto e dados.
-- **Ficha do animal:** histórico de **vacinas, vermífugos, exames, casqueamento**
-  e registros do veterinário (somente leitura).
-- **Agenda:** seus atendimentos.
-- **Finanças:** suas **faturas** e movimentações; pague direto pelo app.
-- **Perfil:** seus dados, compartilhar código do animal, termos.
+1. Abra o app e selecione **Primeiro acesso**.
+2. Informe o **telefone com DDD cadastrado pela clínica**.
+3. Quando o cadastro estiver disponível para criar o acesso, informe seu e-mail e escolha uma senha com pelo menos oito caracteres.
+4. Confirme a senha e conclua. O app abre sua sessão.
 
-## Pagar uma fatura
-1. Vá em **Finanças** e toque na fatura pendente.
-2. Escolha **PIX** (escaneie/copie o QR Code) ou **Cartão**.
-3. Após pagar, a confirmação pode levar alguns instantes.
+Se o cadastro já tiver e-mail, o app apresenta uma indicação mascarada e orienta o acesso pela aba **Já tenho conta**. Use **Esqueci minha senha** para recuperar o acesso. A tela de recuperação também oferece **Esqueci meu e-mail**, usando o telefone cadastrado.
 
-> Dúvidas de cobrança: fale com a clínica/veterinário responsável.
+## Áreas do aplicativo
+
+| Área | O que consultar |
+|---|---|
+| Início e Animais | Animais vinculados e seus dados |
+| Saúde | Histórico de vacinas, vermifugação, exames e casqueamento |
+| Conteúdo do veterinário | Anotações e prescrições compartilhadas |
+| Notas | Anotações próprias do tutor |
+| Agenda | Atendimentos |
+| Finanças | Faturas, seus itens e movimentações |
+| Perfil | Dados da conta, códigos de compartilhamento e opções de acesso |
+
+Os registros clínicos são consultados pelo tutor. O veterinário mantém os registros do atendimento e define o conteúdo compartilhado.
+
+## Pagamento de fatura
+
+1. Abra **Finanças** e selecione a fatura.
+2. Confira os itens e o valor.
+3. Escolha **PIX** ou **Cartão** e preencha os dados solicitados.
+4. No PIX, use o QR Code ou código de pagamento.
+5. Após a confirmação do pagamento, consulte novamente a situação da fatura.
+
+Informações sobre a cobrança são tratadas com a clínica responsável.
+
+## Perfil e conta
+
+Em **Perfil**, é possível editar os dados apresentados, sair da sessão e acessar **Deletar conta**. A exclusão solicita confirmação e encerra o acesso, removendo os dados pessoais previstos nesse fluxo. Registros clínicos e financeiros mantidos pelas clínicas seguem associados à referência da conta excluída.
+
+As orientações de conta também estão disponíveis na página **Excluir conta** do site institucional.

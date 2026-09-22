@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # Tipos de Atendimento Veterinário — Checklist App
 
 Documento de referência para implementar cada tipo de atendimento no app (rotas API, mappers, dashboard vet e tela de lista), alinhado ao painel web (`ServiceRecords.tsx` e `boardRecordService`).

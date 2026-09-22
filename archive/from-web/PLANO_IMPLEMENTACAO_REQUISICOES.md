@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # Plano de Implementação — Status Final
 
 > Quase tudo do doc `Anotações APP.docx` foi implementado. O que ficou tem dependência de backend (upload de arquivos, persistência de `clientId`/`scope`) ou de referência externa.

@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # VetEquus API - Documentação de Rotas
 
 Esta documentação lista todas as rotas disponíveis na API VetEquus, organizadas por categoria e com detalhes sobre métodos HTTP, parâmetros e respostas.

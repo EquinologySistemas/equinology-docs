@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # Guia de Componentes UI — equinology-web
 
 > Componentes reutilizáveis baseados em **Radix UI** e estilizados com Tailwind.  

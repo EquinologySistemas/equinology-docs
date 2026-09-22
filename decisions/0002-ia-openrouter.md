@@ -1,18 +1,21 @@
-# ADR 0002 — IA/transcrição via OpenRouter (server-side)
-
-**Status:** aceito (implementado na web).
-
-## Contexto
-A web usa IA para transcrição de áudio e preenchimento assistido de fichas. Uma
-abordagem anterior usava o SDK `openai` no **cliente**, o que exporia a chave de
-API no browser (`NEXT_PUBLIC_OPENAI_API_KEY`).
+# ADR 0002 — IA e transcrição no servidor da web
 
 ## Decisão
-O fluxo vivo roteia as chamadas por **rotas server-side** do Next
-(`app/api/chat`, `app/api/audio/transcribe*`) usando **OpenRouter**
-(`OPENROUTER_API_KEY`, sem prefixo `NEXT_PUBLIC_`). A chave nunca chega ao browser.
 
-## Consequência
-- A dependência `openai` e a var `NEXT_PUBLIC_OPENAI_API_KEY` ficaram **mortas** —
-  devem ser removidas, e a chave (se já exposta) rotacionada.
-- O componente legado `components/ocr/ocr.tsx` está 100% comentado (morto).
+A web profissional encaminha chat e transcrição para rotas do servidor Next.js, que usam OpenRouter. A variável `OPENROUTER_API_KEY` é lida nesse ambiente de servidor.
+
+## Arquivos
+
+| Responsabilidade | Caminho em equinology-web-v2 |
+|---|---|
+| Chat | `app/api/chat/route.ts` |
+| Transcrição de áudio | `app/api/audio/transcribe/route.ts` |
+| Preenchimento assistido de formulário | `app/api/audio/transcribe-to-form/route.ts` |
+| Preenchimento de odontograma | `app/api/audio/transcribe-to-odontogram/route.ts` |
+| Utilitários compartilhados | `lib/audio-transcribe.ts` |
+
+Prompts, formatos de resposta e seleção de modelo são definidos nesses arquivos. A interface consome o resultado e mantém o fluxo de revisão/preenchimento do formulário.
+
+## Configuração
+
+Configure `OPENROUTER_API_KEY` na hospedagem da web e `NEXT_PUBLIC_APP_URL` para a referência da aplicação. As chaves de integração são administradas no ambiente de servidor. Veja [setup](../guides/developer/setup.md).

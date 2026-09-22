@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # Documentação de Integração API – Equinology App V2
 
 Este documento descreve **todas as chamadas de API** que precisam ser implementadas no **equinology-app-v2**, por tela e por fluxo. A referência é o **app antigo (equinollogy-app)** e a **equinology-api** (NestJS).

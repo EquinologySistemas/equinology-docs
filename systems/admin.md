@@ -1,31 +1,37 @@
-# Sistema: equinology-adm (painel super-admin)
+# Painel administrativo — equinology-adm-v2
 
-**Stack:** Next.js 16 (App Router). **Repo:** `equinology-adm`. Público: equipe interna.
+**Stack:** Next.js 16, React 19 e Tailwind 4.
 
-> O `package.json` ainda se chama `base-project` e o README é boilerplate de
-> starter — **dívida de documentação, não de código**. O app em si é real e
-> totalmente integrado.
+## Áreas
 
-## Rotas
+A entrada pública é `src/app/login/page.tsx`. As páginas de operação ficam em `src/app/(private)/`:
 
-Público: `/login`. Sob `(private)`: `/` (dashboard financeiro + métricas),
-`/users`, `/companies` (tenants), `/plans`, `/coupons`, `/ads` (com targeting
-geográfico + campo `description`), `/subscriptions`, `/financial`, `/admins`
-(gated por `super_admin`).
+| Área | Caminho |
+|---|---|
+| Indicadores e visão financeira | `page.tsx` |
+| Usuários e clínicas | `users/`, `companies/` |
+| Planos, cupons e assinaturas | `plans/`, `coupons/`, `subscriptions/` |
+| Financeiro | `financial/` |
+| Anúncios e segmentação | `ads/` |
+| Biblioteca de tutoriais | `tutorials/` |
+| Equipe administrativa | `admins/` |
 
-Todo item do sidebar resolve para página real; todo endpoint existe como
-controller `admin/*` guardado na API (`AdminAuthGuard`).
+## Integração
 
-## Integração com a API
+`src/context/ApiContext.tsx` usa Axios e `NEXT_PUBLIC_API_URL`. O nome do cookie é resolvido por `src/lib/auth-cookies.ts`, com configuração por `NEXT_PUBLIC_USER_TOKEN`.
 
-- Axios em `context/ApiContext.tsx`, base `NEXT_PUBLIC_API_URL`, Bearer (`auth=true`).
-  401 → logout. Cookie: `equinologyAdminToken`.
+O middleware do painel orienta a navegação com base na sessão. Na API, `AdminAuthGuard`, `AdminSuperAdminGuard` e a verificação da situação do administrador autorizam as operações.
 
-## Pontos de atenção
+Os usuários administrativos são registros `AdminUser`, separados dos profissionais das clínicas. As permissões de `support` e `super_admin` seguem os guards e os controles das telas.
 
-- Auth do shell é **client-side** (`middleware.ts` checa só presença do cookie) —
-  enforcement real depende do `AdminAuthGuard` da API.
-- `context/SampleContext.tsx`: morto + `console.log` de cookies — remover.
-- Renomear `package.json` (`base-project` → `equinology-adm`) e reescrever README.
-- Remover dep `openai` / `OPENAI_API_KEY` do `.env.example` (não usados).
-- Header `ngrok-skip-browser-warning` hardcoded — leftover de túnel de dev.
+## Conteúdo publicado
+
+Os anúncios têm descrição e segmentação geográfica. A API fornece conteúdo de anúncios para a web e uma consulta pública de patrocinadores para o institucional.
+
+Os tutoriais possuem metadados e conteúdo organizado pela API. O institucional consome essa biblioteca em `/tutoriais` e nas páginas de detalhe.
+
+## Desenvolvimento
+
+Use [setup](../guides/developer/setup.md) e [validação](../guides/operations/qa-checklist.md). Os comandos de publicação Next.js estão em [deploy](../guides/operations/deploy.md).
+
+Os relatórios em `docs/auditoria/`, `docs/auditoria-lancamento/` e os documentos de status datados registram etapas de trabalho. Esta página e o índice de `equinology-docs` são a entrada para a manutenção atual.

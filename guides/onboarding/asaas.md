@@ -1,34 +1,26 @@
-# Conta Asaas
+# Asaas — configuração da integração
 
-**Onde:** `https://www.asaas.com/` → "Criar conta" (ou app Asaas).
-**Titularidade:** conta **PJ com o CNPJ do Equinology** — é a conta que recebe os
-pagamentos e cujos dados (API key, walletId) entram no sistema. **Não** usar a
-conta de operações/Gmail aqui; o cadastro é com a identidade da empresa.
+A API centraliza a integração de assinaturas, cobranças e recebimentos em `src/infra/shared/bank/asaas.ts`.
 
-## Pré-requisito
-- [ ] CNPJ **ativo e regular** na Receita.
+## Configuração
 
-## Documentos do responsável (sócio admin / presidente / tesoureiro)
-- [ ] Identificação com foto: RG **ou** CNH
-- [ ] CPF
-- [ ] Comprovante de endereço
-- [ ] (Se profissão regulamentada) carteira profissional (CRMV, OAB, CREA…)
+A API recebe:
 
-## Documentos da empresa
-- [ ] CNPJ, razão social e endereço
-- [ ] Documento societário (contrato social / requerimento de empresário)
-- [ ] Se LTDA e cadastrado por procurador: **procuração**
-- [ ] Se ONG/associação: procuração **+ ata de eleição** do presidente
+| Variável | Uso |
+|---|---|
+| `ASAAS_URL` | URL base do ambiente do gateway |
+| `ASAAS_KEY` | Credencial usada nas chamadas |
+| `ASAAS_WEBHOOK_TOKEN` | Segredo compartilhado com o webhook |
 
-## Verificação de identidade (fim do cadastro)
-- [ ] Pelo **app**: selfie + foto do documento
-- [ ] Pelo **navegador**: informar uma **conta bancária** da empresa
+Os dados de recebimento da clínica, incluindo o identificador de carteira, são tratados pelos cadastros e serviços financeiros da API. Conferir a configuração da clínica ao exercitar cobranças.
 
-## O que entregar ao dev depois de criada (para plugar no sistema)
-- [ ] **API Key** de produção (e, se possível, a de sandbox) → vai em `ASAAS_KEY`
-- [ ] **walletId** da conta (split / recebimento de faturas pelos tutores)
-- [ ] Definir um valor secreto para **`ASAAS_WEBHOOK_TOKEN`** e configurar o
-      webhook no painel Asaas apontando para
-      `https://vet.dominiodev.shop/signature/webhook` com esse token
+## Webhook
 
-> Conta gratuita e sem mensalidade; a análise/aprovação pode levar alguns dias úteis.
+- Endpoint: `https://api.equinology.com.br/signature/webhook`.
+- Método: `POST`.
+- Autenticação: header `asaas-access-token`, com o mesmo valor de `ASAAS_WEBHOOK_TOKEN`.
+- Configuração e eventos devem corresponder ao ambiente da chave utilizada.
+
+Use os controllers e serviços para conferir os eventos processados. O [ADR do webhook](../../decisions/0003-webhook-asaas.md) e o [fluxo de fatura/caixa](../../decisions/0001-fatura-caixa.md) orientam a manutenção.
+
+Para validar a integração, crie uma cobrança de teste e confira os efeitos do webhook em assinatura, fatura e caixa. Os contratos do gateway estão na [documentação do Asaas](https://docs.asaas.com/).

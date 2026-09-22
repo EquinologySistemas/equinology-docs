@@ -1,3 +1,5 @@
+> Registro histórico. Para os procedimentos e o funcionamento da revisão atual, consulte a [documentação técnica](../../README.md).
+
 # Vetequus api API
 
 A **Vetequus api API** foi desenvolvida para coleta e armazenamento de notícias. É parte do sistema **Vetequus api**, que coleta, analisa e gera notícias baseado em IA, alimentando diversos blogs com conteúdo.
