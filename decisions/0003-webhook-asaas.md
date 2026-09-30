@@ -12,6 +12,16 @@ O serviço `CompanySignatureService` trata os eventos de pagamento e os efeitos 
 
 Mudanças de plano, crédito proporcional, recorrência e conciliação pertencem aos respectivos métodos do serviço. Ao alterar esse código, acompanhe a contratação, a chegada do evento e a validação de acesso.
 
+## Teste grátis
+
+Modelo definido com o cliente em 30/09/2026:
+1. A clínica se cadastra e ativa o teste grátis na tela de planos (`POST /signature/start-trial/:planId`). O botão só aparece quando o plano tem `trialDays > 0` e `GET /signature/trial-available` indica que a empresa ainda não usou o teste. O teste vale uma vez por empresa.
+2. Na véspera do fim do teste, o admin da empresa recebe o e-mail "seu acesso termina amanhã".
+3. Quando o teste vence, o acesso é bloqueado: `GET /signature/validation` devolve 403 e a web leva o usuário à tela de planos. O e-mail de teste encerrado é enviado.
+4. O acesso volta com o pagamento: cartão libera na contratação e PIX quando chega o webhook. Os dois viram assinatura recorrente no Asaas.
+
+Os dias de teste são configurados por plano no painel (Planos → dias de trial).
+
 ## Referências
 
 - `src/infra/http/controllers/signature/companySignature.controller.ts`.

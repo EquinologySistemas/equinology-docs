@@ -22,7 +22,10 @@ O provedor SMTP é implementado na classe `BrevoMailProvider`; o host, a porta e
 - Boas-vindas no cadastro de usuário profissional.
 - Recuperação de senha de profissional e tutor.
 - Aviso de inatividade de usuário profissional, com verificação horária e referência de 48 horas.
-- Notificação do encerramento de trial no fluxo agendado correspondente.
+- Aviso de véspera do fim do teste grátis ("seu acesso termina amanhã"), todo dia às 9h de Brasília, para os trials que vencem no dia seguinte (6º dia de um teste de 7).
+- Notificação do encerramento de trial, na verificação horária que marca o trial vencido como inativo.
+
+Os dois e-mails de trial vão para o usuário ADMIN da empresa e estão em `expireTrialSignatures.scheduler.ts`.
 
 Os templates ficam em `src/domain/application/shared/email/templates.ts`. O acompanhamento de atividade e os schedulers ficam nos serviços de conta/assinatura da API.
 

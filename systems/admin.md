@@ -16,6 +16,20 @@ A entrada pública é `src/app/login/page.tsx`. As páginas de operação ficam 
 | Biblioteca de tutoriais | `tutorials/` |
 | Equipe administrativa | `admins/` |
 
+## Operação por tela
+
+- **Empresas:** a lista mostra plano, situação da assinatura, validade e usuários. `companies/[id]` concentra dados cadastrais, assinaturas (com as ações de trocar plano, cancelar, cobrar e reativar), histórico de pagamentos do Asaas e usuários da empresa. Bloquear o acesso é cancelar a assinatura vigente.
+- **Usuários:** exclusão lógica (`DELETE /admin/users/:id`) e restauração (`POST /admin/users/:id/restore`, respeita o limite do plano). "Mostrar excluídos" usa `includeDeleted=true`. A tabela mostra o último acesso.
+- **Assinaturas:** carrega todas as páginas da API, filtra por status e mostra a renovação: automática, desligada ou avulsa. Avulsa são as linhas antigas sem assinatura no Asaas, que não renovam.
+  - "Nova assinatura" (mensal ou anual) e "Reativar" criam uma assinatura recorrente no Asaas e copiam o link da primeira cobrança. O acesso só é liberado quando o webhook confirma o pagamento.
+  - "Reativar" cancela a recorrência anterior e, se houver, a cobrança avulsa ainda em aberto.
+  - "Gerar cobrança" só aparece para assinatura vigente.
+  - Liberar sem pagamento (cortesia, acordo) é feito por "Alterar status ou validade", que avisa isso na tela.
+- **Planos:** a lista vem de `GET /admin/plans` (ativos e inativos). O status é alternado direto na tabela. Plano inativo não aparece na venda do painel.
+- **Financeiro:** filtro por empresa.
+- **Dashboard:** assinaturas vigentes que vencem nos próximos 7 dias.
+- **Administradores:** desativar e reativar (super_admin).
+
 ## Integração
 
 `src/context/ApiContext.tsx` usa Axios e `NEXT_PUBLIC_API_URL`. O nome do cookie é resolvido por `src/lib/auth-cookies.ts`, com configuração por `NEXT_PUBLIC_USER_TOKEN`.
